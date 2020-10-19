@@ -2,9 +2,12 @@ require 'rspec'
 
 class PolyTreeNode
 
+    attr_accessor :distance
+
     def initialize(value)
         @value = value
         @parent = nil
+        @distance = nil
         @children = []
     end
 
@@ -27,6 +30,17 @@ class PolyTreeNode
         nil
     end
 
+    def flatten
+        queue = [self]
+        node_list = []
+        until queue.empty? do
+            current_node = queue.shift
+            node_list << current_node
+            current_node.children.each { |child| queue.push(child) }
+        end
+        node_list
+    end
+
     def parent
         @parent
     end
@@ -43,13 +57,16 @@ class PolyTreeNode
         if node == nil
             @parent.children.delete(self)
             @parent = nil
+            @distance = nil
         elsif @parent == nil
             @parent = node
             node.children << self
+            self.distance = @parent.distance + 1
         else
             @parent.remove_child(self)
             @parent = node
             @parent.children << self
+            @distance = @parent.distance + 1
         end
     end
 
@@ -63,7 +80,6 @@ class PolyTreeNode
         if !@children.include?(child)
             raise "not a child of the node"
         else
-            @children.delete(child)
             child.parent = nil
         end
         

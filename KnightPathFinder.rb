@@ -44,6 +44,8 @@ class KnightPathFinder
         @start_pos = start_position
         @considered_positions = [start_position]
         @root = PolyTreeNode.new(start_position)
+        @root.distance = 0
+        build_move_tree
     end
 
     def find_path(end_pos)
@@ -51,12 +53,36 @@ class KnightPathFinder
     end
 
     def build_move_tree
+        queue = [@root]
+        until queue.empty?
+            current_node = queue.shift
+            new_move_positions(current_node.value).each do |pos|
+                new_node = PolyTreeNode.new(pos)
+                new_node.parent = current_node
+                queue << new_node
+            end
+        end
     end
 
     def new_move_positions(pos)
         valid_moves = KnightPathFinder.valid_moves(pos)
-        valid_moves.select { |move| !@considered_positions.include?(move) }
+        unconsidered_moves = valid_moves.select { |move| !@considered_positions.include?(move) }
+        @considered_positions.concat(unconsidered_moves)
+        unconsidered_moves
     end
+
+    def render
+        board = Array.new(8) { Array.new(8, " ") }
+        @root.flatten.each do |node|
+            row, col = node.value
+            board[row][col] = node.distance.to_s
+        end
+
+        str = board.map do |row| 
+            row.join("")
+        end.join("\n")
+        print str
+    end 
 
 end
 
@@ -75,3 +101,5 @@ end
 #
 #kpf = KnightPathFinder.new([0,0])
 #p kpf.new_move_positions([1,2])
+
+#kpf.render
