@@ -50,6 +50,20 @@ class KnightPathFinder
 
     def find_path(end_pos)
         raise "invalid end position" unless KnightPathFinder.valid_pos(end_pos)
+
+        end_node = @root.bfs(end_pos)
+        return nil unless end_node
+        trace_path_back(end_node)
+    end
+
+    def trace_path_back(end_pos)
+        path = []
+        current_node = end_pos
+        until current_node == nil
+            path.unshift(current_node)
+            current_node = current_node.parent
+        end
+        path
     end
 
     def build_move_tree
@@ -99,7 +113,10 @@ end
 #p KnightPathFinder.valid_moves([2, 2])
 #p KnightPathFinder.valid_moves([1, 2])
 #
-#kpf = KnightPathFinder.new([0,0])
+kpf = KnightPathFinder.new([0,0])
 #p kpf.new_move_positions([1,2])
 
 #kpf.render
+
+p kpf.find_path([7, 6]) # => [[0, 0], [1, 2], [2, 4], [3, 6], [5, 5], [7, 6]]
+p kpf.find_path([6, 2]) # => [[0, 0], [1, 2], [2, 0], [4, 1], [6, 2]]
